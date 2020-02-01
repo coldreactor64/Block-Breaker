@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState, useReducer } from 'react'
-import {registerListener} from '../utils'
+import {registerListener, getRandomFrom} from '../utils'
 import {GameBall, Block} from './gameComponents'
-import { getInitialLevelState, getProjection } from '../Engine/core'
+import { getInitialLevelState, getProjection, getInitialBallPosition, getInitialBallState, RIGHT_UP, LEFT_UP } from '../Engine/core'
 import {reducer, ACTION} from './state'
 import {UPDATE_EVERY, GAME_WIDTH, GAME_HEIGHT} from '../constants'
 
@@ -66,10 +66,16 @@ const getSavedLevel = () => {
   const getInitialState = containerSize => {
     //const level = getSavedLevel(); //Grabs level we're at
     const {level, ball} = getInitialLevelState();
+    const newBall = getInitialBallState();
     const { projectDistance, projectVector, projectDistanceReverse } = getProjection(containerSize, {x: GAME_WIDTH, y: GAME_HEIGHT});
+    let addingBalls = setInterval(()=> {
+      newBall.addBall(getRandomFrom(RIGHT_UP, LEFT_UP));
+    }, 500)
+
     return {
       level,
       ball,
+      newBalls: newBall,
       containerSize,
       projectDistance,
       projectVector,
@@ -146,7 +152,10 @@ const getSavedLevel = () => {
               {...projectVector(props.position)}
             />)
           )}
-        <GameBall {...projectVector(ball.center)} radius={unit} />
+          {
+            state.newBalls.ballsArray.map((props)=> (<GameBall {...projectVector(props.center)} radius= {unit} key = {props.id}/>))
+          }
+        <GameBall {...projectVector(state.newBalls.markerBall.center)} radius={unit}/>
       </svg>
     )
   }

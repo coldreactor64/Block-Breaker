@@ -1,4 +1,4 @@
-import { MOVEMENT, updateGameState, getProjection } from '../Engine/core'
+import { MOVEMENT, updateGameState, getProjection, RIGHT_UP } from '../Engine/core'
 import { GAME_WIDTH, GAME_HEIGHT } from '../constants'
 
  
@@ -66,8 +66,10 @@ const tick = (state) => {
     if (state.isAiming) return state;
     const time = Date.now()
     let newState = updateGameState({...state}, time - state.time)
+    state.newBalls.updatePhysics(state, time - state.time);
+
     newState = { ...newState, time }
-    console.log(newState);
+    //console.log(newState);
     if(newState.shouldMakeNewLevel === true){
       newState.shouldMakeNewLevel = false;
       newState.level.addLevel();

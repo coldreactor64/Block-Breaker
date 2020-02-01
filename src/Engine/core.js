@@ -18,8 +18,8 @@ const RIGHT = new Vector(1, 0)
 const UP = new Vector(0, -1)
 const DOWN = new Vector(0, 1)
 
-const LEFT_UP = LEFT.add(UP).normalize()
-const RIGHT_UP = RIGHT.add(UP).normalize()
+export const LEFT_UP = LEFT.add(UP).normalize()
+export const RIGHT_UP = RIGHT.add(UP).normalize()
 
 /**
  * @function getInitialPaddleAndBallState - Returns the initial state of Paddle and Ball
@@ -41,6 +41,7 @@ export const getInitialBallPosition = (gameWidth, gameHeight) => {
     }
 }
 
+
 export const getGroundedBallPosition = (ballX) => {
  
   let ball = {
@@ -55,17 +56,19 @@ export const getGroundedBallPosition = (ballX) => {
 
 
 class Ball {
-  constructor(x,y, angle, radius){
+  constructor(x,y, angle, radius, id){
     this.center = new Vector(x, y);
-    this.direction = angle
+    this.direction = angle;
     this.radius = radius;
+    this.id = id;
   }
 }
 
-class BallPhysics {
+export class BallPhysics {
   constructor() {
     this.ballsArray = [];
-    this.markerBall = new Ball(GAME_WIDTH / 2, GAME_HEIGHT - ( 1 / 5), getRandomFrom(LEFT_UP, RIGHT_UP), 1/5);
+    this.markerBall = new Ball(GAME_WIDTH / 2, GAME_HEIGHT - ( 1 / 5), getRandomFrom(LEFT_UP, RIGHT_UP), 1/5, 0);
+    this.firstBall = false;
   }
 
   addBall(angle){
@@ -75,13 +78,105 @@ class BallPhysics {
     * Once the first one is down, we use the same kind of thing, where we make marker ball, the X position and 
     * reset Y position to Game height -  ball radius which is 1/5
     */
+
+    function guidGenerator() {
+      var S4 = function() {
+        return (((1+Math.random())*0x10000)|0).toString(16).substring(1);
+      };
+      return (S4());
+    }
+    //TODO add angle calculation here
+    let id = guidGenerator();
+    let newBall = new Ball(this.markerBall.center.x, this.markerBall.center.y, angle, 1/5, id);
+    this.ballsArray.push(newBall);
   }
 
   //We will update physics passing in the block state, and then returning updated block and ball state to render
-  updatePhysics(state){
+  updatePhysics(state, timespan){
       this.ballsArray.forEach(ball => {
+        const { level } = state
+        const distance = timespan * DISTANCE_IN_MS
+        var ballIndex = this.ballsArray.findIndex(x => x.id == ball.id);
+        const { radius } = ball
+        const oldDirection = ball.direction
+        const newBallCenter = ball.center.add(oldDirection.scaleBy(distance))
+        const ballBottom = newBallCenter.y + radius
+
+        // Delete if above gameheight 
+        if (ballBottom > GAME_HEIGHT) {
+          //check if its the first ball to hit the bottom
+          if (this.firstBall === false) {
+            this.markerBall = new Ball(ball.center.x, GAME_HEIGHT - (1/5), {x: 0, y: 0}, 1/5, 0)
+          }
+          //filter out this element
+          this.ballsArray = this.ballsArray.filter(filterBall => filterBall.id != ball.id);
+          return state;
+        }
         
+        // const withNewBallProps = props => ({
+        //   ...state,
+        //   ball: {
+        //     ...state.ball,
+        //     ...props
+        //   }
+        // })
+        const withNewBallProps = props => {
+            this.ballsArray[ballIndex] = {
+              ...ball,
+              ...props
+            }
+          return state;
+        }
+        const withNewBallDirection = normal => {
+          // const distorted = distortVector(oldDirection.reflect(normal))
+          // const direction = adjustVector(normal, distorted)
+          let direction = oldDirection.reflect(normal);
+          return withNewBallProps({ direction }) 
+        }
+        const ballLeft = newBallCenter.x - radius
+        const ballRight = newBallCenter.x + radius
+        const ballTop = newBallCenter.y - radius
+    
+        if (ballTop <= 0) return withNewBallDirection(DOWN)
+        if (ballLeft <= 0) return withNewBallDirection(RIGHT)
+        if (ballRight >= GAME_WIDTH) return withNewBallDirection(LEFT)
+      
+        const block = level.levelList.find(({ position, width, height }) => (
+          boundaryCheck(ballTop, ballBottom, position.y, position.y + height) &&
+          boundaryCheck(ballLeft, ballRight, position.x, position.x + width) 
+        ))
+    
+    
+        if (block) {
+          // const density = block.density - 1
+          // const newBlock = { ...block, density }
+          // const blocks = density < 0 ? withoutElement(state.blocks, block) : updateElement(state.blocks, block, newBlock)
+          
+          const getNewBallNormal = () => {
+
+            const blockTop = block.position.y
+            const blockBottom = blockTop + block.height
+            const blockLeft = block.position.x
+
+            if (ballTop > blockTop - radius && ballBottom < blockBottom + radius) {
+              if (ballLeft < blockLeft) return LEFT
+              if (ballRight > blockLeft + block.width) return RIGHT
+            }
+
+            if (ballTop > blockTop) return DOWN
+            if (ballTop <= blockTop) return UP
+
+          }
+          return {
+            ...withNewBallDirection(getNewBallNormal())
+          }
+        }
+        return withNewBallProps({ center: newBallCenter })
+
+
       })
+
+
   }
 
 
@@ -102,6 +197,11 @@ export const getInitialLevelState = () =>
     }
 }
 
+export const getInitialBallState = () => {
+  let balls = new BallPhysics();
+  balls.addBall(RIGHT_UP, 1);
+  return balls;
+}
 
 /**
  * @function getProjection - gets the scaling size for the screen and container size
