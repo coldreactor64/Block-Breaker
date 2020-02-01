@@ -266,7 +266,73 @@ const adjustVector = (normal, vector, minAngle = 15) => {
 
 export const updateGameState = (state, timespan) => {
     //Step 1: Update Position of the paddle from current state
-    //console.log(state);
 
+    const { ball, level } = state
+    const distance = timespan * DISTANCE_IN_MS
+
+    const { radius } = state.ball
+    const oldDirection = state.ball.direction
+    const newBallCenter = state.ball.center.add(oldDirection.scaleBy(distance))
+    const ballBottom = newBallCenter.y + radius
+
+    if (ballBottom > GAME_HEIGHT) {
+
+      return {
+        ...state,
+        ball: {
+          ...getGroundedBallPosition(ball.center.x)
+        },
+        shouldMakeNewLevel: true
+      }
+    }
+    
+    const withNewBallProps = props => ({
+      ...state,
+      ball: {
+        ...state.ball,
+        ...props
+      }
+    })
   
+    const withNewBallDirection = normal => {
+      const distorted = distortVector(oldDirection.reflect(normal))
+      const direction = adjustVector(normal, distorted)
+      return withNewBallProps({ direction })
+    }
+    const ballLeft = newBallCenter.x - radius
+    const ballRight = newBallCenter.x + radius
+    const ballTop = newBallCenter.y - radius
+
+    if (ballTop <= 0) return withNewBallDirection(DOWN)
+    if (ballLeft <= 0) return withNewBallDirection(RIGHT)
+    if (ballRight >= GAME_WIDTH) return withNewBallDirection(LEFT)
+  
+    const block = level.levelList.find(({ position, width, height }) => (
+      boundaryCheck(ballTop, ballBottom, position.y, position.y + height) &&
+      boundaryCheck(ballLeft, ballRight, position.x, position.x + width) 
+    ))
+
+
+    if (block) {
+      // const density = block.density - 1
+      // const newBlock = { ...block, density }
+      // const blocks = density < 0 ? withoutElement(state.blocks, block) : updateElement(state.blocks, block, newBlock)
+      
+      const getNewBallNormal = () => {
+        const blockTop = block.position.y
+        const blockBottom = blockTop + block.height
+        const blockLeft = block.position.x
+        if (ballTop > blockTop - radius && ballBottom < blockBottom + radius) {
+          if (ballLeft < blockLeft) return LEFT
+          if (ballRight > blockLeft + block.width) return RIGHT
+        }
+        if (ballTop > blockTop) return DOWN
+        if (ballTop <= blockTop) return UP
+      }
+      return {
+        ...withNewBallDirection(getNewBallNormal())
+      }
+    }
+    return withNewBallProps({ center: newBallCenter })
+
 }
