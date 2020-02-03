@@ -128,8 +128,9 @@ export class BallPhysics {
         }
 
         const withNewBallDirection = normal => {
-           const distorted = distortVector(oldDirection.reflect(normal))
-           const direction = adjustVector(normal, distorted)
+          //  const distorted = distortVector(oldDirection.reflect(normal))
+          //  const direction = adjustVector(normal, distorted)
+          const direction = oldDirection.reflect(normal);
           return withNewBallProps({ direction }) 
         }
         const ballLeft = newBallCenter.x - radius
