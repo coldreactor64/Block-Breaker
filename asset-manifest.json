@@ -1,14 +1,14 @@
 {
   "files": {
     "main.css": "/Block-Breaker/static/css/main.dda4ab5c.chunk.css",
-    "main.js": "/Block-Breaker/static/js/main.754018db.chunk.js",
-    "main.js.map": "/Block-Breaker/static/js/main.754018db.chunk.js.map",
+    "main.js": "/Block-Breaker/static/js/main.816ef5ed.chunk.js",
+    "main.js.map": "/Block-Breaker/static/js/main.816ef5ed.chunk.js.map",
     "runtime-main.js": "/Block-Breaker/static/js/runtime-main.72ee0bb1.js",
     "runtime-main.js.map": "/Block-Breaker/static/js/runtime-main.72ee0bb1.js.map",
     "static/js/2.412b73f3.chunk.js": "/Block-Breaker/static/js/2.412b73f3.chunk.js",
     "static/js/2.412b73f3.chunk.js.map": "/Block-Breaker/static/js/2.412b73f3.chunk.js.map",
     "index.html": "/Block-Breaker/index.html",
-    "precache-manifest.c952816514a0de76e735d79843e53290.js": "/Block-Breaker/precache-manifest.c952816514a0de76e735d79843e53290.js",
+    "precache-manifest.cce21eda198cda7bf221f8c0503944f9.js": "/Block-Breaker/precache-manifest.cce21eda198cda7bf221f8c0503944f9.js",
     "service-worker.js": "/Block-Breaker/service-worker.js",
     "static/css/main.dda4ab5c.chunk.css.map": "/Block-Breaker/static/css/main.dda4ab5c.chunk.css.map",
     "static/js/2.412b73f3.chunk.js.LICENSE": "/Block-Breaker/static/js/2.412b73f3.chunk.js.LICENSE"
@@ -17,6 +17,6 @@
     "static/js/runtime-main.72ee0bb1.js",
     "static/js/2.412b73f3.chunk.js",
     "static/css/main.dda4ab5c.chunk.css",
-    "static/js/main.754018db.chunk.js"
+    "static/js/main.816ef5ed.chunk.js"
   ]
 }
