@@ -29,31 +29,31 @@ export const RIGHT_UP = RIGHT.add(UP).normalize()
  * @returns {JSON} Returns paddle and ball state
  */
 export const getInitialBallPosition = (gameWidth, gameHeight) => {
-    //TODO: turn the paddle area and ball radius into constants
     const ball = {
         center: new Vector(GAME_WIDTH / 2, GAME_HEIGHT - ( 1 / 5)),
         radius: 1 / 5,
         direction: getRandomFrom(LEFT_UP, RIGHT_UP)
       }
-
     return {
         ball
     }
 }
 
 
-export const getGroundedBallPosition = (ballX) => {
- 
-  let ball = {
-      center: new Vector(ballX, GAME_HEIGHT - (1/5)),
-      radius: 1 / 5,
-      direction: getRandomFrom(LEFT_UP, RIGHT_UP)
-    }
-
-  console.log(ball);
-  return ball;
+export const getInitialLevelState = () => 
+{   
+    let level = new Levels();
+    level.addLevel(1);
+    return {
+        level: level
+      }
 }
 
+
+export const getInitialBallState = () => {
+  let balls = new BallPhysics();
+  return balls;
+}
 
 class Ball {
   constructor(x,y, angle, radius, id){
@@ -69,8 +69,14 @@ export class BallPhysics {
     this.ballsArray = [];
     this.markerBall = new Ball(GAME_WIDTH / 2, GAME_HEIGHT - ( 1 / 5), getRandomFrom(LEFT_UP, RIGHT_UP), 1/5, 0);
     this.firstBall = false;
+    this.isStarted = false;
   }
 
+
+  reset() {
+    this.firstBall = false;
+    this.isStarted = false;
+  }
   addBall(angle){
     //TODO: to add a ball, add a new Ball, based off of markerBall X, and Y position, along with angle we are launching from
     //TODO: then we can update physics on each Ball, every iteration
@@ -78,17 +84,20 @@ export class BallPhysics {
     * Once the first one is down, we use the same kind of thing, where we make marker ball, the X position and 
     * reset Y position to Game height -  ball radius which is 1/5
     */
-
-    function guidGenerator() {
-      var S4 = function() {
-        return (((1+Math.random())*0x10000)|0).toString(16).substring(1);
-      };
-      return (S4());
+    if(Number.isNaN(angle.x) || Number.isNaN(angle.y)){}
+      else{
+        function guidGenerator() {
+          var S4 = function() {
+            return (((1+Math.random())*0x10000)|0).toString(16).substring(1);
+          };
+          return (S4());
+        }
+        //TODO add angle calculation here
+        let id = guidGenerator();
+        let newBall = new Ball(this.markerBall.center.x, this.markerBall.center.y, angle, 1/5, id);
+        this.ballsArray.push(newBall);
+        this.isStarted = true;
     }
-    //TODO add angle calculation here
-    let id = guidGenerator();
-    let newBall = new Ball(this.markerBall.center.x, this.markerBall.center.y, angle, 1/5, id);
-    this.ballsArray.push(newBall);
   }
 
   //We will update physics passing in the block state, and then returning updated block and ball state to render
@@ -106,31 +115,25 @@ export class BallPhysics {
         if (ballBottom > GAME_HEIGHT) {
           //check if its the first ball to hit the bottom
           if (this.firstBall === false) {
+            this.firstBall = true;
             this.markerBall = new Ball(ball.center.x, GAME_HEIGHT - (1/5), {x: 0, y: 0}, 1/5, 0)
           }
           //filter out this element
-          this.ballsArray = this.ballsArray.filter(filterBall => filterBall.id != ball.id);
-          return state;
+          let newArray = this.ballsArray.filter(filterBall => filterBall.id != ball.id);
+          return (this.ballsArray = newArray);
         }
         
-        // const withNewBallProps = props => ({
-        //   ...state,
-        //   ball: {
-        //     ...state.ball,
-        //     ...props
-        //   }
-        // })
         const withNewBallProps = props => {
             this.ballsArray[ballIndex] = {
               ...ball,
               ...props
             }
-          return state;
+          return;
         }
+
         const withNewBallDirection = normal => {
-          // const distorted = distortVector(oldDirection.reflect(normal))
-          // const direction = adjustVector(normal, distorted)
-          let direction = oldDirection.reflect(normal);
+           const distorted = distortVector(oldDirection.reflect(normal))
+           const direction = adjustVector(normal, distorted)
           return withNewBallProps({ direction }) 
         }
         const ballLeft = newBallCenter.x - radius
@@ -151,7 +154,6 @@ export class BallPhysics {
           // const density = block.density - 1
           // const newBlock = { ...block, density }
           // const blocks = density < 0 ? withoutElement(state.blocks, block) : updateElement(state.blocks, block, newBlock)
-          
           const getNewBallNormal = () => {
 
             const blockTop = block.position.y
@@ -172,36 +174,15 @@ export class BallPhysics {
           }
         }
         return withNewBallProps({ center: newBallCenter })
-
-
       })
 
-
+      return state;
   }
 
 
 
 }
 
-
-
-
-
-export const getInitialLevelState = () => 
-{   
-    let level = new Levels();
-    level.addLevel(1);
-    return {
-        level: level,
-        ...getInitialBallPosition()
-    }
-}
-
-export const getInitialBallState = () => {
-  let balls = new BallPhysics();
-  balls.addBall(RIGHT_UP, 1);
-  return balls;
-}
 
 /**
  * @function getProjection - gets the scaling size for the screen and container size
@@ -229,7 +210,9 @@ export const getProjection = (containerSize, gameSize) => {
          * @param {Vector} vector - vector to project to screen size
          * @returns {Vector} returns scaled vector
          */
-        projectVector: vector => vector.scaleBy(screenUnit)
+        projectVector: vector => vector.scaleBy(screenUnit),
+        projectVectorReverse: vector => vector.scaleBy(1 / screenUnit)
+
     }
 }
 
@@ -354,85 +337,4 @@ const adjustVector = (normal, vector, minAngle = 15) => {
       }
     }
     return vector
-}
-/**
- * @function updateGameState - update the game state
- * @param {*} state - current game state
- * @param {*} movement - is the paddle moving
- * @param {*} timespan - time between last update and now
- * @returns {*} - new state of the game
- */
-
-
-export const updateGameState = (state, timespan) => {
-    //Step 1: Update Position of the paddle from current state
-
-    const { ball, level } = state
-    const distance = timespan * DISTANCE_IN_MS
-
-    const { radius } = state.ball
-    const oldDirection = state.ball.direction
-    const newBallCenter = state.ball.center.add(oldDirection.scaleBy(distance))
-    const ballBottom = newBallCenter.y + radius
-
-    if (ballBottom > GAME_HEIGHT) {
-
-      return {
-        ...state,
-        ball: {
-          ...getGroundedBallPosition(ball.center.x)
-        },
-        shouldMakeNewLevel: true
-      }
-    }
-    
-    const withNewBallProps = props => ({
-      ...state,
-      ball: {
-        ...state.ball,
-        ...props
-      }
-    })
-  
-    const withNewBallDirection = normal => {
-      const distorted = distortVector(oldDirection.reflect(normal))
-      const direction = adjustVector(normal, distorted)
-      return withNewBallProps({ direction })
-    }
-    const ballLeft = newBallCenter.x - radius
-    const ballRight = newBallCenter.x + radius
-    const ballTop = newBallCenter.y - radius
-
-    if (ballTop <= 0) return withNewBallDirection(DOWN)
-    if (ballLeft <= 0) return withNewBallDirection(RIGHT)
-    if (ballRight >= GAME_WIDTH) return withNewBallDirection(LEFT)
-  
-    const block = level.levelList.find(({ position, width, height }) => (
-      boundaryCheck(ballTop, ballBottom, position.y, position.y + height) &&
-      boundaryCheck(ballLeft, ballRight, position.x, position.x + width) 
-    ))
-
-
-    if (block) {
-      // const density = block.density - 1
-      // const newBlock = { ...block, density }
-      // const blocks = density < 0 ? withoutElement(state.blocks, block) : updateElement(state.blocks, block, newBlock)
-      
-      const getNewBallNormal = () => {
-        const blockTop = block.position.y
-        const blockBottom = blockTop + block.height
-        const blockLeft = block.position.x
-        if (ballTop > blockTop - radius && ballBottom < blockBottom + radius) {
-          if (ballLeft < blockLeft) return LEFT
-          if (ballRight > blockLeft + block.width) return RIGHT
-        }
-        if (ballTop > blockTop) return DOWN
-        if (ballTop <= blockTop) return UP
-      }
-      return {
-        ...withNewBallDirection(getNewBallNormal())
-      }
-    }
-    return withNewBallProps({ center: newBallCenter })
-
 }

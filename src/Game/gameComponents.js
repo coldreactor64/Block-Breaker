@@ -21,6 +21,11 @@ export const Paddle = ({ x, y, width, height }) => (
   )
 
 
-export const NewBlock = ({blocks}) => {
-    
+export const trajectoryPointer = (circlemarker, projectvector) => {
+    let {x, y} = projectvector(circlemarker);
+    return (
+    <>
+    <circle className = 'ball' cx={x} cy={y} r = {1/5} style = {{transformOrigin: "0px 10px", transform: "rotate(30)"}} />
+    </>
+    )
 }

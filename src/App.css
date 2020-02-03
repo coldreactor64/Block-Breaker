@@ -41,6 +41,8 @@ body {
 
 .scene {
   border: 2px solid var(--text-color);
+  align-self: center;
+  justify-self: center;
 }
 
 .paddle {
@@ -58,4 +60,10 @@ body {
 
 .life {
   fill: var(--action-color);
+}
+
+.line {
+  stroke: yellow;
+  stroke-width: 2px;
+  stroke-linecap: round;
 }
