@@ -21,7 +21,12 @@ const getBlockColors = (density) => {
 
 export const Block =({ x, y, width, height, density, color }) => {
     return (
+    <g>
     <rect className='block' fill={color} x={x} y={y}  rx = {width / 16} width={width - 5} height={height-3} />
+    <text x={(x + (width / 2) - 6)} y = {y + (height / 2) + 3} font-size = {20} class = 'level'>
+        {density}
+    </text>
+    </g>
 );
 }
 

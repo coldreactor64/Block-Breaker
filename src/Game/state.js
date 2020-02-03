@@ -72,6 +72,7 @@ const tick = (state) => {
       newState.level.addLevel();
       newState.isAiming = true;
       newState.levelNumber++;
+      newState.ball.reset();
     }
     newState = { ...newState, time }
     return { ...newState }
