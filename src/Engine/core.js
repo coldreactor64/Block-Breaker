@@ -1,5 +1,5 @@
 import Vector from "./vector";
-import {getRandomFrom} from '../utils'
+import {getRandomFrom, guidGenerator} from '../utils'
 import {GAME_HEIGHT, GAME_WIDTH} from '../constants'
 
 import {Levels} from './levels';
@@ -86,12 +86,6 @@ export class BallPhysics {
     */
     if(Number.isNaN(angle.x) || Number.isNaN(angle.y)){}
       else{
-        function guidGenerator() {
-          var S4 = function() {
-            return (((1+Math.random())*0x10000)|0).toString(16).substring(1);
-          };
-          return (S4());
-        }
         //TODO add angle calculation here
         let id = guidGenerator();
         let newBall = new Ball(this.markerBall.center.x, this.markerBall.center.y, angle, 1/5, id);
@@ -151,7 +145,11 @@ export class BallPhysics {
     
     
         if (block) {
-          // const density = block.density - 1
+          block.density = block.density - 1
+          if (block.density <= 0){
+            let newArray = state.level.levelList.filter(filterBlock => filterBlock.id != block.id);
+            state.level.levelList = newArray;
+          }
           // const newBlock = { ...block, density }
           // const blocks = density < 0 ? withoutElement(state.blocks, block) : updateElement(state.blocks, block, newBlock)
           const getNewBallNormal = () => {

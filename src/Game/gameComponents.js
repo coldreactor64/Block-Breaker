@@ -4,9 +4,26 @@ export const GameBall = ({x,y, radius}) => (
     <circle className = 'ball' cx={x} cy={y} r = {radius}/>
 )
 
-export const Block =({ x, y, width, height, density }) => (
-    <rect className='block' fill={colors[density]} x={x} y={y}  rx = {width / 16} width={width - 5} height={height-3} />
+const getBlockColors = (density) => {
+    if (density % 2){
+        return colors[1]
+    }
+    if (density % 3){
+        return colors[2]
+    }
+    if (density % 4){
+        return colors[3]
+    }
+    if (density % 5){
+        return colors[4]
+    }
+}
+
+export const Block =({ x, y, width, height, density, color }) => {
+    return (
+    <rect className='block' fill={color} x={x} y={y}  rx = {width / 16} width={width - 5} height={height-3} />
 );
+}
 
 export const LevelLabel = ({level, unit}) => (
     <text x={unit} y = {unit * 2} className = 'level'>

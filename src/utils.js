@@ -12,7 +12,12 @@ export const mapNumbers = (num, in_min, in_max, out_min, out_max) => {
     return (num - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
   }
   
-
+export function guidGenerator() {
+    var S4 = function() {
+      return (((1+Math.random())*0x10000)|0).toString(16).substring(1);
+    };
+    return (S4());
+  }
 
 export const flatten = arrays => arrays.reduce((acc, row)=>[...acc, ...row], []);
 export const getRange = length => [...Array(length).keys()];

@@ -143,9 +143,7 @@ const getSavedLevel = () => {
 
     
     useEffect(()=>{
-      console.log(props.click, state.isAiming);
       if(props.click && state.isAiming) {
-        console.log("isAiming");
         act(ACTION.AIMING, {angle: ballAngle});
       }
       },[state.isAiming, props.click, ballAngle]);
@@ -204,6 +202,7 @@ const getSavedLevel = () => {
               key={`${props.position.x}-${props.position.y}`}
               width={projectDistance(props.width)}
               height={projectDistance(props.height)}
+              color = {props.color}
               {...projectVector(props.position)}
             />)
           )}

@@ -1,8 +1,8 @@
-import {GAME_WIDTH} from '../constants'
+import {GAME_WIDTH, colors} from '../constants'
 //import { flatten } from '../utils'
 import Vector from './vector'
+import { guidGenerator, getRandomFrom } from '../utils';
 //TODO: generate Block other position parameters based on position
-
 const DOWN = new Vector(0, 1);
 
 class Block {
@@ -12,6 +12,9 @@ class Block {
         this.position = new Vector(index, 0) // X, Y cords1Q ``` 
         this.width = 1;
         this.height = 1;
+        this.id = guidGenerator();
+        this.color = colors[Math.floor(Math.random() * colors.length)]
+
     }
 
     add(x, y) {
