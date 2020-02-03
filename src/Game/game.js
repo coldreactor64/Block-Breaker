@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState, useReducer } from 'react'
 import {registerListener,registerListenerByReference, getRandomFrom, mapNumbers} from '../utils'
 import {GameBall, Block, trajectoryPointer} from './gameComponents'
-import { getInitialLevelState, getProjection, getInitialBallPosition, getInitialBallState, RIGHT_UP, LEFT_UP } from '../Engine/core'
+import { getInitialLevelState, getProjection, getInitialBallState } from '../Engine/core'
 import {reducer, ACTION} from './state'
 import {UPDATE_EVERY, GAME_WIDTH, GAME_HEIGHT} from '../constants'
 import Vector from '../Engine/vector'
@@ -20,13 +20,6 @@ export const GamePage = () => {
             setSize({width, height})
         }
         const unregisterResizeListener = registerListener('resize', onResize);
-
-        const onMouseOver = (e) => {
-          setMouse({x: e.clientX, y: e.clientY})
-        }
-
-        const unregisterMouseMoveListener = registerListener('mousemove',(e)=> onMouseOver(e));
-
         const onMouseDown = (e) => {
           setClick(true);
         }
@@ -38,7 +31,7 @@ export const GamePage = () => {
         const unregisterMouseUpListener = registerListener('mouseup',(e)=> onMouseUp(e));
         onResize();
 
-        return {unregisterResizeListener, unregisterMouseMoveListener, unregisterMouseDownListener, unregisterMouseUpListener}; //unregister the listener when not rendered anymore
+        return {unregisterResizeListener, unregisterMouseDownListener, unregisterMouseUpListener}; //unregister the listener when not rendered anymore
     }, [])
 
 
@@ -146,6 +139,9 @@ const getSavedLevel = () => {
       if(props.click && state.isAiming) {
         act(ACTION.AIMING, {angle: ballAngle});
       }
+      // if(props.click){
+      //   state.ball.addBall(new Vector(Math.cos(ballAngle),Math.sin(ballAngle)));
+      // }
       },[state.isAiming, props.click, ballAngle]);
 
 

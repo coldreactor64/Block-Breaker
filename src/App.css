@@ -53,9 +53,15 @@ body {
   fill: var(--action-color);
 }
 
-.level {
+.ballid {
   font-weight: bold;
   fill: var(--text-color);
+  pointer-events: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+
 }
 
 .life {
