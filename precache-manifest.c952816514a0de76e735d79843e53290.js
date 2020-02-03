@@ -1,11 +1,11 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "01a7a8f96a2d488fac465c9a68be1298",
+    "revision": "4aae09ef8c868f58219998392d223666",
     "url": "/Block-Breaker/index.html"
   },
   {
-    "revision": "fb076901fae2d9e92032",
-    "url": "/Block-Breaker/static/css/main.e36924d4.chunk.css"
+    "revision": "b7e1f8d107783579cfc0",
+    "url": "/Block-Breaker/static/css/main.dda4ab5c.chunk.css"
   },
   {
     "revision": "e7e5a568dd129b3f717d",
@@ -16,8 +16,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/Block-Breaker/static/js/2.412b73f3.chunk.js.LICENSE"
   },
   {
-    "revision": "fb076901fae2d9e92032",
-    "url": "/Block-Breaker/static/js/main.ada05835.chunk.js"
+    "revision": "b7e1f8d107783579cfc0",
+    "url": "/Block-Breaker/static/js/main.754018db.chunk.js"
   },
   {
     "revision": "dffaff97e2cafb232006",
