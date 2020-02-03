@@ -6,7 +6,7 @@ import {Levels} from './levels';
 //Game core puts size and positions in relative to game size which then gets projected to the actual size
 
 
-const DISTANCE_IN_MS = 0.005
+const DISTANCE_IN_MS = 0.01
 
 export const MOVEMENT = {
   LEFT: 'LEFT',
@@ -88,6 +88,8 @@ export class BallPhysics {
       else{
         //TODO add angle calculation here
         let id = guidGenerator();
+        console.log(angle);
+        console.log(this.markerBall.center.x);
         let newBall = new Ball(this.markerBall.center.x, this.markerBall.center.y, angle, 1/5, id);
         this.ballsArray.push(newBall);
         this.isStarted = true;
@@ -228,77 +230,6 @@ const distortVector = (vector, distortionLevel = 0.3) => {
     //add it to the vector and normalize it.
     return vector.add(distortion).normalize()
 }
-
-/**
- * @function updatePaddlePosition - gets the new position of the paddle
- * @param {*} paddle - contains {positon: Vector, width, height} as paddle paramaters
- * @param {*} size - size of the play area in blocks
- * @param {*} distance - distance that it can move a tick
- * @param {*} movement - Are we moving?
- * @returns {JSON} - Returns paddle with update position
- */
-const updatePaddlePosition = (paddle, size, distance, movement) => {
-    //If we have no movement, return paddle
-    if(!movement) return paddle;
-    const movementDirection =  movement === MOVEMENT.LEFT ? LEFT : RIGHT
-    //calculate new position
-    const { x } = paddle.position.add(movementDirection.scaleBy(distance)) 
-    
-    const returnNewPosition = (x) => ({
-        ...paddle,
-        position: new Vector(x, paddle.position.y)
-    })
-    
-    //Check if it falls off any of the edges
-    if (x < 0) {
-        return returnNewPosition(0);
-    }
-    if (x + paddle.width > size.width){
-        return returnNewPosition(size.width - paddle.width);
-    }
-
-    return returnNewPosition(x);
-}
-
-
-const getNewAngle = (Ball, Mouse) => {
-  //TODO: pythagorean theorem on 3 points ([BallX, BallY], [MouseX, MouseY], [MouseX, BallY])
-
-  const distanceFormula = (x1,y1,x2,y2) => {
-    return Math.sqrt(((x2 - x1)^2) + ((y2-y1)^2)).toFixed(3);
-  }
-  var hypoDistance = distanceFormula(Mouse.x, Mouse.y, Ball.x, Ball.y); //this is the hypo of the right triangle
-  var leg1Distance = distanceFormula(Ball.x, Ball.y, Mouse.x, Ball.y); //This the the horizontal (ball) ------- (mouseX, ballY)
-  var leg2Distance = distanceFormula(Mouse.x, Mouse.y, Mouse.x, Ball.y); //this is the vertical leg from mouse to bottom
-
-  let mouseAngle = (leg2Distance / hypoDistance).toFixed(3);
-
-  console.log(mouseAngle);
-
-  
-}
-
-
-
-
-// const updatePaddlePositionMouse = (paddle, gameSize, containerSize, oldMousePosition, newMousePosition, projectDistanceReverse) => {
-//   if(oldMousePosition === newMousePosition) return paddle;
-//   const  x  = projectDistanceReverse(newMousePosition.mouseX);
-//   const returnNewPosition = (newMousePosition) =>({
-//         ...paddle,
-//         position: new Vector(x, paddle.position.y)
-//     })
-
-//     //Check if it falls off any of the edges
-//   if (x < 0) {
-//       return returnNewPosition(0);
-//   }
-//   if (x + paddle.width > gameSize.width){
-//       return returnNewPosition(gameSize.width - paddle.width);
-//   }
-
-// }
-
 
 
 /**

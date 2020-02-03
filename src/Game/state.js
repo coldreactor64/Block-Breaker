@@ -43,8 +43,9 @@ const containerSizeChange = (state, containerSize)=> ({
 
 const aimBalls = (state, props) => {
   state.isAiming = false;
-  for (let i = 0; i < state.levelNumber; i++) {
+  for (let i = 0; i < state.levelNumber - 1; i++) {
       setTimeout((i) => {
+        // console.log(props.angle);
         state.ball.addBall(new Vector(Math.cos(props.angle), Math.sin(props.angle)));
       }, 100 * i);
   }
